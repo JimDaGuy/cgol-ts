@@ -24,23 +24,25 @@
       Any live cell with more than three live neighbors dies, as if by overpopulation.
       Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
     */
-    class Cell {
-        constructor(x, y, xVel, yVel) {
-            this.x = x;
-            this.y = y;
-            this.xVel = xVel;
-            this.yVel = yVel;
-        }
-        progress() {
-            this.x = this.x + this.xVel;
-            this.y = this.y + this.yVel;
-        }
-        dirStar() {
-            console.dir(`${this.x},${this.y} : ${this.xVel},${this.yVel}`);
-        }
-    }
     let aliveCells = {};
     let newAliveCells = {};
+    // Create an empty object and copy the aliveCells values to it
+    const createNewAlive = (currentAlive) => {
+        let newAlive = {};
+        for (let x in currentAlive) {
+            for (let y in currentAlive[x]) {
+                if (x in newAlive) {
+                    newAlive[x][y] = true;
+                }
+                else {
+                    newAlive[x] = {};
+                    newAlive[x][y] = true;
+                }
+            }
+        }
+        return newAlive;
+    };
+    // Draw lines on the board
     const drawLines = () => {
         ctx.strokeStyle = lineColor;
         ctx.lineWidth = lineWidth;
@@ -59,12 +61,12 @@
             ctx.stroke();
         }
     };
+    // Iterate through alive cells and draw them
     const drawCells = () => {
         ctx.fillStyle = deadColor;
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
         ctx.fillStyle = aliveColor;
         let xCells = Object.keys(aliveCells);
-        console.dir(aliveCells);
         for (let i = 0; i < xCells.length; i++) {
             let currXCell = xCells[i];
             let yCells = Object.keys(aliveCells[currXCell]);
@@ -76,30 +78,33 @@
             }
         }
     };
+    // Update the life of cells after a cycle
     const updateCells = () => {
-        // Update Cells
-        newAliveCells = Object.assign({}, aliveCells);
+        // Create copy of currently alive cells
+        newAliveCells = createNewAlive(aliveCells);
+        // Check every cell
         for (let i = 1; i <= numHorCells; i++) {
             for (let j = 1; j <= numVertCells; j++) {
-                // Check number of alive neighbors
-                let aliveNeighbors = 0;
-                let alive = false;
                 // Check if current cell is alive
-                if (i in aliveCells) {
-                    if (j in aliveCells[i]) {
+                let alive = false;
+                let x = i.toString();
+                let y = j.toString();
+                if (x in aliveCells) {
+                    if (y in aliveCells[x]) {
                         alive = true;
                     }
                 }
+                // Check number of alive neighbors
+                let aliveNeighbors = 0;
                 // Iterate through neighbor positions, ignoring the cell being checked
                 for (let k = -1; k < 2; k++) {
                     for (let l = -1; l < 2; l++) {
                         if (k != 0 || l != 0) {
-                            if (i === 4 && j === 4) {
-                                console.dir(i + k);
-                                console.dir(aliveCells[i + k]);
-                            }
-                            if (i + k in aliveCells) {
-                                if (j + l in aliveCells[i + k]) {
+                            let neighborX = (i + k).toString();
+                            let neighborY = (j + l).toString();
+                            // Check if current neighbor is alive
+                            if (neighborX in aliveCells) {
+                                if (neighborY in aliveCells[neighborX]) {
                                     aliveNeighbors++;
                                 }
                             }
@@ -109,17 +114,16 @@
                 // Any live cell with fewer than two live neighbors dies, as if by underpopulation. 
                 // Any live cell with more than three live neighbors dies, as if by overpopulation.
                 if (alive && (aliveNeighbors < 2 || aliveNeighbors > 3)) {
-                    delete newAliveCells[i][j];
+                    delete newAliveCells[x][y];
                 }
                 // Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
                 else if (!alive && aliveNeighbors === 3) {
-                    console.dir(`Dead cell with three alive neighbors at ${i},${j}`);
-                    if (i in newAliveCells) {
-                        newAliveCells[i][j] = true;
+                    if (x in newAliveCells) {
+                        newAliveCells[x][y] = true;
                     }
                     else {
-                        newAliveCells[i] = {};
-                        newAliveCells[i][j] = true;
+                        newAliveCells[x] = {};
+                        newAliveCells[x][y] = true;
                     }
                 }
             }
@@ -128,23 +132,20 @@
         drawCells();
         drawLines();
     };
+    // Set a cell to alive when the canvas is clicked
     const canvasClick = (e) => {
         let rect = canvas.getBoundingClientRect();
-        let x = e.clientX - rect.left;
-        let y = e.clientY - rect.top;
-        x = Math.ceil(x / squareWidth);
-        y = Math.ceil(y / squareWidth);
-        console.dir(`${x}:${y}`);
+        let x = Math.ceil((e.clientX - rect.left) / squareWidth).toString();
+        let y = Math.ceil((e.clientY - rect.top) / squareWidth).toString();
         // Add clicked cell to alive cells
         if (x in aliveCells) {
             aliveCells[x][y] = true;
-            console.dir(`Adding to existing x ${x},${y}`);
         }
         else {
             aliveCells[x] = {};
             aliveCells[x][y] = true;
-            console.dir(`New x ${x},${y}`);
         }
+        // Redraw cells and lines
         drawCells();
         drawLines();
     };
