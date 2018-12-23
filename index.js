@@ -7,8 +7,8 @@
     var numHorCells_1 = canvasWidth_1 / squareWidth_1;
     var numVertCells_1 = canvasHeight_1 / squareWidth_1;
     var lineColor_1 = 'black';
-    var deadColor_1 = 'green';
-    var aliveColor_1 = 'red';
+    var deadColor_1 = 'blue';
+    var aliveColor_1 = 'yellow';
     var h1 = document.createElement('h1');
     h1.style.textAlign = 'center';
     h1.style.margin = '20px 0';
@@ -104,7 +104,7 @@
     christmasSetup_1['25'] = {};
     christmasSetup_1['25']['12'] = true;
     christmasSetup_1['25']['13'] = true;
-    var aliveCells_1 = createNewAlive_1(christmasSetup_1);
+    var aliveCells_1 = {};
     var newAliveCells_1 = {};
     // Draw lines on the board
     var drawLines_1 = function () {
@@ -239,12 +239,14 @@
         clearButton.style.margin = '20px';
         clearButton.onclick = function () {
             aliveCells_1 = {};
+            deadColor_1 = 'blue';
+            aliveColor_1 = 'yellow';
             drawCells_1();
             drawLines_1();
         };
         document.body.append(clearButton);
         var christmasButton = document.createElement('button');
-        christmasButton.innerText = 'Christmas Cells';
+        christmasButton.innerText = 'Christmas Mode';
         christmasButton.style.width = '200px';
         christmasButton.style.height = '75px';
         christmasButton.style.cssFloat = 'left';
@@ -254,6 +256,8 @@
         christmasButton.style.margin = '20px';
         christmasButton.onclick = function () {
             aliveCells_1 = createNewAlive_1(christmasSetup_1);
+            deadColor_1 = 'red';
+            aliveColor_1 = 'green';
             drawCells_1();
             drawLines_1();
         };

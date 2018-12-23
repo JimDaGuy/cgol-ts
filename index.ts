@@ -8,9 +8,9 @@
   const numHorCells: number = canvasWidth / squareWidth;
   const numVertCells: number = canvasHeight / squareWidth;
 
-  const lineColor: string = 'black';
-  const deadColor: string = 'green';
-  const aliveColor: string = 'red';
+  let lineColor: string = 'black';
+  let deadColor: string = 'blue';
+  let aliveColor: string = 'yellow';
 
   const h1 = document.createElement('h1');
   h1.style.textAlign = 'center';
@@ -111,7 +111,7 @@
   christmasSetup['25']['12'] = true;
   christmasSetup['25']['13'] = true;
 
-  let aliveCells = createNewAlive(christmasSetup);
+  let aliveCells = {};
   let newAliveCells = {};
 
   // Draw lines on the board
@@ -262,13 +262,15 @@
     clearButton.style.margin = '20px';
     clearButton.onclick = () => {
       aliveCells = {};
+      deadColor = 'blue';
+      aliveColor = 'yellow';
       drawCells();
       drawLines();
     };
     document.body.append(clearButton);
 
     let christmasButton = document.createElement('button');
-    christmasButton.innerText = 'Christmas Cells';
+    christmasButton.innerText = 'Christmas Mode';
     christmasButton.style.width = '200px';
     christmasButton.style.height = '75px';
     christmasButton.style.cssFloat = 'left';
@@ -278,6 +280,8 @@
     christmasButton.style.margin = '20px';
     christmasButton.onclick = () => {
       aliveCells = createNewAlive(christmasSetup);
+      deadColor = 'red';
+      aliveColor = 'green';
       drawCells();
       drawLines();
     };
